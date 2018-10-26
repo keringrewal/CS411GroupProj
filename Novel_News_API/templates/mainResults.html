@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Project Titile</title>
+  </head>
+  <link rel="stylesheet" href="mainPage.css">
+  <body>
+    <div class="TopBar">
+          <h1>What's up!</h1>
+      <a class="active" href="#home">Home</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+      <form class="Search" action="action_page.php">
+        <input type="text" placeholder="Search.." name="search">
+      </form>
+    </div>
+
+
+    <div class="News">
+      <h3>Top News</h3>
+      <p>read more</p>
+    </div>
+    <div class="Twit">
+      <h3>Top Twitter Posts</h3>
+
+    </div>
+    <div class="Youtube">
+      <h3>Youtube Video Results</h3>
+
+    {% for video in videos %}
+        <tr>
+            <td> {{ video.title }} </td>
+            <td> {{ video.dateTime }} </td>
+            <td> {{ video.url }} </td>
+            <td> {{ video.body }} </td>
+        </tr>
+    {% endfor %}
+
+
+      </video>
+    </div>
+  </body>
+</html>
