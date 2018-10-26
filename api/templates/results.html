@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Results</title>
+</head>
+<body>
+
+{% for video in results %}
+        <tr>
+            <td> {{ video.title }} </td>
+            <td> {{ video.dateTime }} </td>
+            <td> {{ video.url }} </td>
+            <td> {{ video.body }} </td>
+        </tr>
+{% endfor %}
+
+</body>
+</html>
