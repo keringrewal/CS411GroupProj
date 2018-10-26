@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Project Titile</title>
+  </head>
+  <link rel="stylesheet" href="mainPage.css">
+  <body>
+    <div class="TopBar">
+          <h1>What's up!</h1>
+      <a class="active" href="#home">Home</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+
+      <form action="{{ url_for('search') }}" class="form" method="POST">
+        <input type="text" placeholder="Search..">
+        <input type=submit name=search>
+
+      </form>
+
+    </div>
+
+
+    <div class="News">
+      <h3>Top News</h3>
+      <p>read more</p>
+    </div>
+    <div class="Twit">
+      <h3>Top Twitter Posts</h3>
+
+    </div>
+    <div class="Youtube">
+      <h3>Top Youtube Videos</h3>
+{#      <video src="videofile.ogg" autoplay poster="posterimage.jpg">#}
+
+      </video>
+    </div>
+  </body>
+</html>
