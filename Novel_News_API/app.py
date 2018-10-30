@@ -4,11 +4,14 @@ import flask
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
+from eventregistry import *
+import key_store
+
 
 # The CLIENT_SECRETS_FILE variable specifies the name of a file that contains
 # the OAuth 2.0 information for this application, including its client_id and
 # client_secret.
-CLIENT_SECRETS_FILE = "client_secret.json"
+CLIENT_SECRETS_FILE = "info.json"
 
 # This OAuth 2.0 access scope allows for full read/write access to the
 # authenticated user's account and requires requests to use an SSL connection.
@@ -16,11 +19,11 @@ SCOPES = ['https://www.googleapis.com/auth/youtube.force-ssl']
 API_SERVICE_NAME = 'youtube'
 API_VERSION = 'v3'
 
-app = flask.Flask(__name__)
+app = flask.Flask(__name__, template_folder='templates')
 # Note: A secret key is included in the sample so that it works, but if you
 # use this code in your application please replace this with a truly secret
 # key. See http://flask.pocoo.org/docs/0.12/quickstart/#sessions.
-app.secret_key = 'REPLACE ME - this value is here as a placeholder.'
+app.secret_key = 'INSERT CLIENT ID HERE'
 
 
 @app.route('/')
@@ -35,10 +38,10 @@ def index():
     client = googleapiclient.discovery.build(
         API_SERVICE_NAME, API_VERSION, credentials=credentials)
 
-    return channels_list_by_username(client,
-                                     part='snippet,contentDetails,statistics',
-                                     forUsername='GoogleDevelopers')
-
+    return flask.render_template('mainPage.html')
+    # return channels_list_by_username(client,
+    #                                  part='snippet,contentDetails,statistics',
+    #                                  forUsername='GoogleDevelopers')
 
 @app.route('/authorize')
 def authorize():
@@ -88,7 +91,36 @@ def oauth2callback():
         'scopes': credentials.scopes
     }
 
-    return flask.redirect(flask.url_for('index'))
+    return flask.render_template('mainPage.html')
+
+# @app.route('/', methods=['GET', 'POST'])
+# def mainpage():
+#     return flask.render_template('mainPage.html')
+
+
+@app.route("/search/", methods=["POST"])
+def search():
+    if flask.request.method == 'POST':
+        key = key_store.get_yt_key()
+        er = EventRegistry(key)
+
+        print("hello")
+
+        # search by title
+        search_term = flask.request.form.get('search')
+
+        # input string from search bar output into George Clooney
+        results = []
+
+        q = QueryArticlesIter(conceptUri=er.getConceptUri(search_term))
+        for art in q.execQuery(er, sortBy="date"):
+            results.append(art)
+            if len(results) == 10:
+                break
+
+        print(results)
+        return flask.render_template('mainResults.html', videos=results)
+
 
 
 def channels_list_by_username(client, **kwargs):

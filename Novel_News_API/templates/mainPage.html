@@ -11,9 +11,13 @@
       <a class="active" href="#home">Home</a>
       <a href="#about">About</a>
       <a href="#contact">Contact</a>
-      <form class="Search" action="action_page.php">
-        <input type="text" placeholder="Search.." name="search">
+
+      <form action="{{ url_for('search') }}" class="form" method="POST">
+        <input type="text" placeholder="Search..">
+        <input type=submit name=search>
+
       </form>
+
     </div>
 
 
@@ -27,7 +31,7 @@
     </div>
     <div class="Youtube">
       <h3>Top Youtube Videos</h3>
-      <video src="videofile.ogg" autoplay poster="posterimage.jpg">
+{#      <video src="videofile.ogg" autoplay poster="posterimage.jpg">#}
 
       </video>
     </div>
