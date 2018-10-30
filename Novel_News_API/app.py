@@ -5,13 +5,19 @@ import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
 from eventregistry import *
-import key_store
+from private import key_store
+import argparse
+import shlex
+from search_youtube import youtube_search
+
+from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
 
 
 # The CLIENT_SECRETS_FILE variable specifies the name of a file that contains
 # the OAuth 2.0 information for this application, including its client_id and
 # client_secret.
-CLIENT_SECRETS_FILE = "info.json"
+CLIENT_SECRETS_FILE = "private/info.json"
 
 # This OAuth 2.0 access scope allows for full read/write access to the
 # authenticated user's account and requires requests to use an SSL connection.
@@ -101,25 +107,21 @@ def oauth2callback():
 @app.route("/search/", methods=["POST"])
 def search():
     if flask.request.method == 'POST':
-        key = key_store.get_yt_key()
-        er = EventRegistry(key)
-
-        print("hello")
 
         # search by title
         search_term = flask.request.form.get('search')
+        search_string = ("--q={0} --max-results=5").format(search_term)
+        print(search_term)
+        parser = argparse.ArgumentParser()
+        parser.add_argument('--q', help='Search term', default='Google')
+        parser.add_argument('--max-results', help='Max results', default=25)
 
-        # input string from search bar output into George Clooney
-        results = []
+        args = parser.parse_args(shlex.split(search_string))
 
-        q = QueryArticlesIter(conceptUri=er.getConceptUri(search_term))
-        for art in q.execQuery(er, sortBy="date"):
-            results.append(art)
-            if len(results) == 10:
-                break
+        results = youtube_search(args)
+        print(results[0])
 
-        print(results)
-        return flask.render_template('mainResults.html', videos=results)
+        return flask.render_template('mainResults.html', video=results[0])
 
 
 
@@ -136,3 +138,5 @@ if __name__ == '__main__':
     # running in production *do not* leave this option enabled.
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
     app.run('localhost', 8090, debug=True)
+
+

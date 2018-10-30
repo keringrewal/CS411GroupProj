@@ -11,15 +11,10 @@
       <a class="active" href="#home">Home</a>
       <a href="#about">About</a>
       <a href="#contact">Contact</a>
-<<<<<<< HEAD
       <form action="{{ url_for('search') }}" class="form" method="POST">
-        <input type="text" placeholder="Search..">
-        <input type=submit name=search>
+        <input type="text" placeholder="Search.." name = 'search'>
+        <input type=submit>
 
-=======
-      <form class="Search" action="action_page.php">
-        <input type="text" placeholder="Search.." name="search">
->>>>>>> 78c2241dc53931bae9e1028a1fdde17a72b813de
       </form>
     </div>
 
@@ -35,15 +30,6 @@
     <div class="Youtube">
       <h3>Youtube Video Results</h3>
 
-<<<<<<< HEAD
-{#    {% for video in videos %}#}
-{#        <tr>#}
-{#            <td> {{ video.title }} </td>#}
-{#            <td> {{ video.dateTime }} </td>#}
-{#            <td> {{ video.url }} </td>#}
-{#            <td> {{ video.body }} </td>#}
-{#        </tr>#}
-{#    {% endfor %}#}
 
     <!-- 1. The <iframe> (and video player) will replace this <div> tag. -->
     <div id="player"></div>
@@ -63,7 +49,7 @@
         player = new YT.Player('player', {
           height: '390',
           width: '640',
-          videoId: 'R4yfueb2pTY',
+          videoId: {{ video }},
           events: {
             'onReady': onPlayerReady,
             'onStateChange': onPlayerStateChange
@@ -90,19 +76,10 @@
         player.stopVideo();
       }
     </script>
-=======
-    {% for video in videos %}
-        <tr>
-            <td> {{ video.title }} </td>
-            <td> {{ video.dateTime }} </td>
-            <td> {{ video.url }} </td>
-            <td> {{ video.body }} </td>
-        </tr>
-    {% endfor %}
-
->>>>>>> 78c2241dc53931bae9e1028a1fdde17a72b813de
 
       </video>
     </div>
+
+
   </body>
 </html>
