@@ -11,10 +11,15 @@
       <a class="active" href="#home">Home</a>
       <a href="#about">About</a>
       <a href="#contact">Contact</a>
+<<<<<<< HEAD
       <form action="{{ url_for('search') }}" class="form" method="POST">
         <input type="text" placeholder="Search..">
         <input type=submit name=search>
 
+=======
+      <form class="Search" action="action_page.php">
+        <input type="text" placeholder="Search.." name="search">
+>>>>>>> 78c2241dc53931bae9e1028a1fdde17a72b813de
       </form>
     </div>
 
@@ -30,6 +35,7 @@
     <div class="Youtube">
       <h3>Youtube Video Results</h3>
 
+<<<<<<< HEAD
 {#    {% for video in videos %}#}
 {#        <tr>#}
 {#            <td> {{ video.title }} </td>#}
@@ -84,6 +90,17 @@
         player.stopVideo();
       }
     </script>
+=======
+    {% for video in videos %}
+        <tr>
+            <td> {{ video.title }} </td>
+            <td> {{ video.dateTime }} </td>
+            <td> {{ video.url }} </td>
+            <td> {{ video.body }} </td>
+        </tr>
+    {% endfor %}
+
+>>>>>>> 78c2241dc53931bae9e1028a1fdde17a72b813de
 
       </video>
     </div>
