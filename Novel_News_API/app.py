@@ -111,7 +111,7 @@ def search():
         # search by title
         search_term = flask.request.form.get('search')
         search_string = ("--q={0} --max-results=5").format(search_term)
-        print(search_term)
+
         parser = argparse.ArgumentParser()
         parser.add_argument('--q', help='Search term', default='Google')
         parser.add_argument('--max-results', help='Max results', default=25)
@@ -119,9 +119,12 @@ def search():
         args = parser.parse_args(shlex.split(search_string))
 
         results = youtube_search(args)
-        print(results[0])
 
-        return flask.render_template('mainResults.html', video=results[0])
+        results = [result.split('\t') for result in results]
+
+        video = results[0][1]
+        print(video)
+        return flask.render_template('mainResults.html', videos=results, video = video)
 
 
 
