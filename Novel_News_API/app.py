@@ -5,7 +5,6 @@ import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
 from eventregistry import *
-from private import key_store
 import argparse
 import shlex
 from search_youtube import youtube_search
@@ -122,8 +121,9 @@ def search():
 
         results = [result.split('\t') for result in results]
 
-        video = results[0][1]
+        video = "https://www.youtube.com/embed/" + results[0][1].strip()
         print(video)
+
         return flask.render_template('mainResults.html', videos=results, video = video)
 
 

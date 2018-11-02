@@ -1,5 +1,4 @@
 from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
 
 
 DEVELOPER_KEY = 'AIzaSyBkuM7s5AMLBq7Gn0zwGQ43HDjehpXo624'
