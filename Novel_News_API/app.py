@@ -116,8 +116,9 @@ def search():
 
         results = [result.split('\t') for result in results]
 
-        video = results[0][1]
+        video = "https://www.youtube.com/embed/" + results[0][1].strip()
         print(video)
+
         return flask.render_template('mainResults.html', videos=results, video = video)
 
 
