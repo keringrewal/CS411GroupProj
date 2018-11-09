@@ -1,4 +1,3 @@
-import os
 import flask
 
 import google.oauth2.credentials
@@ -8,10 +7,6 @@ from eventregistry import *
 import argparse
 import shlex
 from search_youtube import youtube_search
-
-from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
-
 
 # The CLIENT_SECRETS_FILE variable specifies the name of a file that contains
 # the OAuth 2.0 information for this application, including its client_id and
