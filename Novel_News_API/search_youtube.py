@@ -1,7 +1,7 @@
 from googleapiclient.discovery import build
+from private import key_store as ks
 
-
-DEVELOPER_KEY = 'AIzaSyBkuM7s5AMLBq7Gn0zwGQ43HDjehpXo624'
+DEVELOPER_KEY = ks.get_yt_keys()
 YOUTUBE_API_SERVICE_NAME = 'youtube'
 YOUTUBE_API_VERSION = 'v3'
 
