@@ -7,6 +7,7 @@ def search_twitter(keywords):
         tso.set_keywords(keywords) # let's define all words we would like to have a look for
         tso.set_language('en') # we want to see German tweets only
         tso.set_include_entities(False) # and don't give us all those entity information
+        tso.set_count(10)
 
         info = ks.get_twitter_keys()
 
