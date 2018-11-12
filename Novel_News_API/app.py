@@ -7,11 +7,15 @@ from eventregistry import *
 import argparse
 import shlex
 from search_youtube import youtube_search
+<<<<<<< HEAD
 import search_NYT
 import search_twitter
 import search_youtube
 
 from nltk.corpus import stopwords
+=======
+from datetime import *
+>>>>>>> f09c3763370d1a5673926e2258d3f91a0464d0a2
 
 # The CLIENT_SECRETS_FILE variable specifies the name of a file that contains
 # the OAuth 2.0 information for this application, including its client_id and
@@ -43,6 +47,7 @@ def index():
     client = googleapiclient.discovery.build(
         API_SERVICE_NAME, API_VERSION, credentials=credentials)
 
+<<<<<<< HEAD
     info = get_today_info()
     article = info['article']
     tweets = info['tweets']
@@ -51,6 +56,12 @@ def index():
     video = "https://www.youtube.com/embed/" + yt[0][1].strip()
     print(video)
     return flask.render_template('mainPage.html', article = article, tweets = tweets, videos = yt, vid = video)
+=======
+    date = datetime.today()
+    # minDate = datetime.today().timedelta(days = -30).strftime('%Y-%m-%d')
+
+    return flask.render_template('mainPage.html', date = date)
+>>>>>>> f09c3763370d1a5673926e2258d3f91a0464d0a2
     # return channels_list_by_username(client,
     #                                  part='snippet,contentDetails,statistics',
     #                                  forUsername='GoogleDevelopers')
@@ -102,7 +113,10 @@ def oauth2callback():
         'client_secret': credentials.client_secret,
         'scopes': credentials.scopes
     }
+    date = datetime.today()
+    # minDate = datetime.today().timedelta(days = -30).strftime('%Y-%m-%d')
 
+<<<<<<< HEAD
     info = get_today_info()
     article = info['article']
     tweets = info['tweets']
@@ -111,6 +125,9 @@ def oauth2callback():
     video = "https://www.youtube.com/embed/" + yt[0][1].strip()
     print(video)
     return flask.render_template('mainPage.html', article = article, tweets = tweets, videos = yt, vid = video)
+=======
+    return flask.render_template('mainPage.html', date = date)
+>>>>>>> f09c3763370d1a5673926e2258d3f91a0464d0a2
 
 
 
