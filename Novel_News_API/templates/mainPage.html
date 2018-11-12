@@ -33,12 +33,19 @@
             <a class="nav-link" href="#">Contact</a>
           </li>
         </ul>
+<<<<<<< HEAD
         <div class="Search col-12 col-sm-6">
           <h3></h3>
           <form>
               <div>
                 <label for="party">Search news in the last 30 days:</label>
                 <input type="date" id="dateSearch" name="search"
+=======
+          <form class="form-inline my-2 my-lg-0" action="" method="POST">
+              <div>
+                <label for="party">For the last 30 days:</label>
+                <input type="date" id="dateSearch" name="search" class="form-control mr-sm-2"
+>>>>>>> 9e46f65d5df4c621829890ca2179f269820eed22
                        value = "{{ date.year }}-{{ date.month }}-{{date.day }}"
                        min="{{ date.year }}-{{ date.month - 1 }}-{{ date.day }}"
                        max="{{ date.year }}-{{ date.month }}-{{date.day }}"
@@ -46,8 +53,12 @@
                 <span class="validity"></span>
                 <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
               </div>
+<<<<<<< HEAD
             </form>
         </div>
+=======
+          </form>
+>>>>>>> 9e46f65d5df4c621829890ca2179f269820eed22
       </div>
         </div>
     </nav>
@@ -68,12 +79,11 @@
                 </tr><br>
                 {% endfor %}
             </table>
-
-
         </div>
 
         <div class="News col-12 col-sm-6">
           <h3>Top New York Times News</h3>
+<<<<<<< HEAD
           <p>read more</p>
             <table>
                 {% for info in article %}
@@ -83,6 +93,11 @@
             {% endfor %}
             </table>
         </div>
+=======
+            <iframe src="{{ article.1 }}" frameborder="5" width = 100% height = 500=% sandbox = ""></iframe>
+            <a href="{{ article.1 }}" font = sm>{{ article.1 }}</a>
+
+>>>>>>> 9e46f65d5df4c621829890ca2179f269820eed22
       </div>
     <br>
     <br>
@@ -112,9 +127,7 @@
         </div>
       </div>
     </div>
-
-
-
+    </div>
 
   </body>
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
