@@ -12,3 +12,4 @@ def search_NYT():
     parsed_json = json.loads(r.text)
 
     return parsed_json
+
