@@ -7,6 +7,7 @@ from eventregistry import *
 import argparse
 import shlex
 from search_youtube import youtube_search
+from datetime import *
 
 # The CLIENT_SECRETS_FILE variable specifies the name of a file that contains
 # the OAuth 2.0 information for this application, including its client_id and
@@ -38,7 +39,10 @@ def index():
     client = googleapiclient.discovery.build(
         API_SERVICE_NAME, API_VERSION, credentials=credentials)
 
-    return flask.render_template('mainPage.html')
+    date = datetime.today()
+    # minDate = datetime.today().timedelta(days = -30).strftime('%Y-%m-%d')
+
+    return flask.render_template('mainPage.html', date = date)
     # return channels_list_by_username(client,
     #                                  part='snippet,contentDetails,statistics',
     #                                  forUsername='GoogleDevelopers')
@@ -90,8 +94,10 @@ def oauth2callback():
         'client_secret': credentials.client_secret,
         'scopes': credentials.scopes
     }
+    date = datetime.today()
+    # minDate = datetime.today().timedelta(days = -30).strftime('%Y-%m-%d')
 
-    return flask.render_template('mainPage.html')
+    return flask.render_template('mainPage.html', date = date)
 
 # @app.route('/', methods=['GET', 'POST'])
 # def mainpage():
