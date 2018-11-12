@@ -1,5 +1,7 @@
 from TwitterSearch import *
 from private import key_store as ks
+import json
+import requests
 
 def search_twitter(keywords):
     try:
@@ -19,17 +21,25 @@ def search_twitter(keywords):
             access_token_secret = info["access_secret"]
          )
 
+
         tweets = []
 
         for tweet in ts.search_tweets_iterable(tso):
-            if not tweet['text'].startswith('RT'):
-                tweets.append('@%s tweeted: %s' % (tweet['user']['screen_name'], tweet['text']))
-            if len(tweets) == 20:
+            if not tweet['text'].startswith('RT') and not tweet['text'].startswith(keywords[0]):
+                value = {'id': tweet['id_str'], 'user': tweet['user']['screen_name'], 'text': tweet['text']}
+                url = "http://twitter.com/{0}/status/{1}".format(value['user'], value['id'])
+
+                info = [url, value['text'], value['user']]
+                tweets.append(info)
+            if len(tweets) == 10:
                 break
+
         return tweets
+
+
 
     except TwitterSearchException as e: # take care of all those ugly errors if there are some
         print(e)
 
 
-search_twitter(['Elections', 'Senate', 'Politics', 'Government', 'Senate', 'Republican', 'Party', 'Democratic', 'Party'])
+print(search_twitter(['Elections', 'Senate', 'Politics', 'Government']))

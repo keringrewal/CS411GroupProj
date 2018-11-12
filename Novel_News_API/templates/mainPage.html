@@ -33,10 +33,21 @@
             <a class="nav-link" href="#">Contact</a>
           </li>
         </ul>
-        <form class="form-inline my-2 my-lg-0" action="{{ url_for('search') }}" method="POST">
-          <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-        </form>
+        <div class="Search col-12 col-sm-6">
+          <h3></h3>
+          <form>
+              <div>
+                <label for="party">Search news in the last 30 days:</label>
+                <input type="date" id="dateSearch" name="search"
+                       value = "{{ date.year }}-{{ date.month }}-{{date.day }}"
+                       min="{{ date.year }}-{{ date.month - 1 }}-{{ date.day }}"
+                       max="{{ date.year }}-{{ date.month }}-{{date.day }}"
+                       required>
+                <span class="validity"></span>
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+              </div>
+            </form>
+        </div>
       </div>
         </div>
     </nav>
@@ -50,8 +61,11 @@
             <table>
                 {% for tweet in tweets %}
                 <tr>
-                    {{ tweet }}
-                </tr>
+                    <blockquote class="twitter-tweet" data-cards="hidden" data-lang="en"><p lang="en" dir="ltr">{{ tweet.1 }} </p>&mdash; {{ tweet.2 }} <a href={{tweet.0}}> </a></blockquote>
+                    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+                </tr><br>
                 {% endfor %}
             </table>
 
@@ -68,21 +82,6 @@
                 </tr>
             {% endfor %}
             </table>
-        </div>
-          <div class="Search col-12 col-sm-6">
-          <h3></h3>
-          <form>
-              <div>
-                <label for="party">Search news in the last 30 days:</label>
-                <input type="date" id="dateSearch" name="search"
-                       value = "{{ date.year }}-{{ date.month }}-{{date.day }}"
-                       min="{{ date.year }}-{{ date.month - 1 }}-{{ date.day }}"
-                       max="{{ date.year }}-{{ date.month }}-{{date.day }}"
-                       required>
-                <span class="validity"></span>
-                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-              </div>
-            </form>
         </div>
       </div>
     <br>
