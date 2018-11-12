@@ -155,7 +155,7 @@ def channels_list_by_username(client, **kwargs):
 def get_today_info():
 
     top_stories = search_NYT.search_NYT()
-    top_story = top_stories['results'][0]
+    top_story = top_stories['results'][6]
 
     stops = set(stopwords.words('english'))
 
