@@ -52,7 +52,6 @@ def index():
     yt = info['youtube']
 
     video = "https://www.youtube.com/embed/" + yt[0][1].strip()
-    print(video)
 
     date = datetime.today()
     return flask.render_template('mainPage.html', article = article, tweets = tweets, videos = yt, vid = video, date = date)
@@ -115,7 +114,7 @@ def oauth2callback():
     yt = info['youtube']
 
     video = "https://www.youtube.com/embed/" + yt[0][1].strip()
-    print(video)
+
     return flask.render_template('mainPage.html', article = article, tweets = tweets, videos = yt, vid = video, date = date)
 
 
@@ -139,7 +138,6 @@ def search():
         results = [result.split('\t') for result in results]
 
         video = "https://www.youtube.com/embed/" + results[0][1].strip()
-        print(video)
 
         return flask.render_template('mainResults.html', videos=results, video = video)
 
@@ -183,12 +181,10 @@ def get_today_info():
 
     top_tweets = search_twitter.search_twitter(keywords)
     top_videos = search_youtube.youtube_search(args)
-    print(top_videos)
 
     article = [top_story['title'], top_story['url']]
 
     return {'article': article, 'tweets' : top_tweets, 'youtube' : top_videos}
-
 
 
 if __name__ == '__main__':
