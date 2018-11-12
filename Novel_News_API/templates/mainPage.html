@@ -38,12 +38,30 @@
       <div class="row">
         <div class="Twit col-12 col-sm-6">
           <h3>Top Twitter Posts</h3>
+            <table>
+                {% for tweet in tweets %}
+                <tr>
+                    {{ tweet }}
+                </tr>
+                {% endfor %}
+            </table>
+
+
         </div>
         <div class="News col-12 col-sm-6">
           <h3>Top News</h3>
           <p>read more</p>
+            <table>
+                {% for info in article %}
+                <tr>
+                    {{ info }}
+                </tr>
+            {% endfor %}
+            </table>
         </div>
       </div>
+    <br>
+    <br>
       <div class="row">
         <div class="Youtube col">
           <h3>Top Youtube Videos</h3>
@@ -54,13 +72,16 @@
           </tr>
           {% for video in videos %}
               <tr>
-              {% for item in video %}
-                  <td>{{ item }}</td>
-                  {% endfor %}
+              {% for info in video %}
+                  <td>
+                    {{ info }}
+                  </td>
+              <br>
+              {% endfor %}
               </tr>
           {% endfor %}
           </table>
-        <iframe width="828" height="466" src={{ video }} frameborder="0"
+        <iframe width="828" height="466" src={{ vid }} frameborder="0"
                 allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
                 allowfullscreen>
         </iframe>

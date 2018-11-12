@@ -7,6 +7,11 @@ from eventregistry import *
 import argparse
 import shlex
 from search_youtube import youtube_search
+import search_NYT
+import search_twitter
+import search_youtube
+
+from nltk.corpus import stopwords
 
 # The CLIENT_SECRETS_FILE variable specifies the name of a file that contains
 # the OAuth 2.0 information for this application, including its client_id and
@@ -38,7 +43,14 @@ def index():
     client = googleapiclient.discovery.build(
         API_SERVICE_NAME, API_VERSION, credentials=credentials)
 
-    return flask.render_template('mainPage.html')
+    info = get_today_info()
+    article = info['article']
+    tweets = info['tweets']
+    yt = info['youtube']
+
+    video = "https://www.youtube.com/embed/" + yt[0][1].strip()
+    print(video)
+    return flask.render_template('mainPage.html', article = article, tweets = tweets, videos = yt, vid = video)
     # return channels_list_by_username(client,
     #                                  part='snippet,contentDetails,statistics',
     #                                  forUsername='GoogleDevelopers')
@@ -91,11 +103,15 @@ def oauth2callback():
         'scopes': credentials.scopes
     }
 
-    return flask.render_template('mainPage.html')
+    info = get_today_info()
+    article = info['article']
+    tweets = info['tweets']
+    yt = info['youtube']
 
-# @app.route('/', methods=['GET', 'POST'])
-# def mainpage():
-#     return flask.render_template('mainPage.html')
+    video = "https://www.youtube.com/embed/" + yt[0][1].strip()
+    print(video)
+    return flask.render_template('mainPage.html', article = article, tweets = tweets, videos = yt, vid = video)
+
 
 
 @app.route("/search/", methods=["POST"])
@@ -130,10 +146,49 @@ def channels_list_by_username(client, **kwargs):
 
     return flask.jsonify(**response)
 
+def get_today_info():
+
+    top_stories = search_NYT.search_NYT()
+    top_story = top_stories['results'][0]
+
+    stops = set(stopwords.words('english'))
+
+    search_term = str(top_story['adx_keywords'])
+    search_term = search_term.replace(';', ' ')
+    search_terms = search_term.split(' ')
+    search_terms = [w.replace(',', '') for w in search_terms]
+
+    search_terms = [w for w in search_terms if not w in stops]
+
+    yt_search = "|".join(search_terms)
+
+    search_string = ("--q={0} --max-results=5").format(yt_search)
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--q', help='Search term', default='Google')
+    parser.add_argument('--max-results', help='Max results', default=25)
+
+    args = parser.parse_args(shlex.split(search_string))
+
+    keywords = top_story['title']
+    keywords = keywords.split(' ')
+    keywords = [w.replace(',', '') for w in keywords]
+    keywords = [w for w in keywords if not w in stops]
+
+    top_tweets = search_twitter.search_twitter(keywords)
+    top_videos = search_youtube.youtube_search(args)
+    print(top_videos)
+
+    article = [top_story['title'], top_story['url']]
+
+    return {'article': article, 'tweets' : top_tweets, 'youtube' : top_videos}
+
+
 
 if __name__ == '__main__':
     # When running locally, disable OAuthlib's HTTPs verification. When
     # running in production *do not* leave this option enabled.
+
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
     app.run('localhost', 8090, debug=True)
 

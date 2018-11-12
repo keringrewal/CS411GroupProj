@@ -7,7 +7,7 @@ def search_twitter(keywords):
         tso.set_keywords(keywords) # let's define all words we would like to have a look for
         tso.set_language('en') # we want to see German tweets only
         tso.set_include_entities(False) # and don't give us all those entity information
-        tso.set_count(10)
+
 
         info = ks.get_twitter_keys()
 
@@ -19,12 +19,17 @@ def search_twitter(keywords):
             access_token_secret = info["access_secret"]
          )
 
-         # this is where the fun actually starts :)
+        tweets = []
+
         for tweet in ts.search_tweets_iterable(tso):
-            print( '@%s tweeted: %s' % ( tweet['user']['screen_name'], tweet['text'] ) )
+            if not tweet['text'].startswith('RT'):
+                tweets.append('@%s tweeted: %s' % (tweet['user']['screen_name'], tweet['text']))
+            if len(tweets) == 20:
+                break
+        return tweets
 
     except TwitterSearchException as e: # take care of all those ugly errors if there are some
         print(e)
 
 
-search_twitter(['Trump', 'California'])
+search_twitter(['Elections', 'Senate', 'Politics', 'Government', 'Senate', 'Republican', 'Party', 'Democratic', 'Party'])

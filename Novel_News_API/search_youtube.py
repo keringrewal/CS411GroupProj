@@ -35,6 +35,6 @@ def youtube_search(options):
 
     # Add each result to the list, and then display the list of matching videos.
     for search_result in search_response.get('items', []):
-        videos.append("%s \t %s" % (search_result['snippet']['title'],
-                                    search_result['id']['videoId']))
+        videos.append([search_result['snippet']['title'],
+                                    search_result['id']['videoId']])
     return videos
