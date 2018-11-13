@@ -46,15 +46,18 @@ def index():
     client = googleapiclient.discovery.build(
         API_SERVICE_NAME, API_VERSION, credentials=credentials)
 
+    date = datetime.today()
+
     info = get_today_info()
     article = info['article']
     tweets = info['tweets']
     yt = info['youtube']
 
-    video = "https://www.youtube.com/embed/" + yt[0][1].strip()
+    videos = "https://www.youtube.com/embed/VIDEO_ID?playlist="
+    for title, id in yt:
+        videos = videos + ',' + id
 
-    date = datetime.today()
-    return flask.render_template('mainPage.html', article = article, tweets = tweets, videos = yt, vid = video, date = date)
+    return flask.render_template('mainPage.html', article = article, tweets = tweets, videos = videos, date = date)
 
 
 @app.route('/authorize')
@@ -113,9 +116,11 @@ def oauth2callback():
     tweets = info['tweets']
     yt = info['youtube']
 
-    video = "https://www.youtube.com/embed/" + yt[0][1].strip()
+    videos = "https://www.youtube.com/embed/VIDEO_ID?playlist="
+    for title, id in yt:
+        videos = videos + ',' + id
 
-    return flask.render_template('mainPage.html', article = article, tweets = tweets, videos = yt, vid = video, date = date)
+    return flask.render_template('mainPage.html', article = article, tweets = tweets, videos = videos, date = date)
 
 
 

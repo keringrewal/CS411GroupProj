@@ -40,6 +40,3 @@ def search_twitter(keywords):
 
     except TwitterSearchException as e: # take care of all those ugly errors if there are some
         print(e)
-
-
-print(search_twitter(['Elections', 'Senate', 'Politics', 'Government']))
