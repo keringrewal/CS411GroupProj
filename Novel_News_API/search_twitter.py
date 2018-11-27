@@ -25,7 +25,8 @@ def search_twitter(keywords):
         tweets = []
 
         for tweet in ts.search_tweets_iterable(tso):
-            if not tweet['text'].startswith('RT') and not tweet['text'].startswith(keywords[0]):
+            if not tweet['text'].startswith('RT') and not tweet['text'].startswith(keywords[0]) \
+                    and not tweet['text'].startswith('"' + keywords[0]):
                 value = {'id': tweet['id_str'], 'user': tweet['user']['screen_name'], 'text': tweet['text']}
                 url = "http://twitter.com/{0}/status/{1}".format(value['user'], value['id'])
 

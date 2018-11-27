@@ -12,8 +12,8 @@ import search_NYT
 import search_twitter
 import search_youtube
 
+import string
 from nltk.corpus import stopwords
-
 from datetime import *
 
 # The CLIENT_SECRETS_FILE variable specifies the name of a file that contains
@@ -116,6 +116,8 @@ def oauth2callback():
     tweets = info['tweets']
     yt = info['youtube']
 
+    print(article)
+
     videos = "https://www.youtube.com/embed/VIDEO_ID?playlist="
     for title, id in yt:
         videos = videos + ',' + id
@@ -158,7 +160,10 @@ def channels_list_by_username(client, **kwargs):
 def get_today_info():
 
     top_stories = search_NYT.search_NYT()
-    top_story = top_stories['results'][6]
+    # top_5 = []
+
+    # for i in range(5):
+    top_story = top_stories['results'][0]
 
     stops = set(stopwords.words('english'))
 
@@ -180,8 +185,9 @@ def get_today_info():
     args = parser.parse_args(shlex.split(search_string))
 
     keywords = top_story['title']
+    exclude = set(string.punctuation)
+    keywords = ''.join(ch for ch in keywords if ch not in exclude)
     keywords = keywords.split(' ')
-    keywords = [w.replace(',', '') for w in keywords]
     keywords = [w for w in keywords if not w in stops]
 
     top_tweets = search_twitter.search_twitter(keywords)
@@ -190,6 +196,10 @@ def get_today_info():
     article = [top_story['title'], top_story['url']]
 
     return {'article': article, 'tweets' : top_tweets, 'youtube' : top_videos}
+
+    #     top_5[i] = {'article': article, 'tweets' : top_tweets, 'youtube' : top_videos}
+    #
+    # return top_5
 
 
 if __name__ == '__main__':
