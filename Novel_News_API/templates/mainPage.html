@@ -29,9 +29,11 @@
     m = n.getMonth() + 1;
     d = n.getDate();
     document.getElementById("dateSearch").innerHTML = y + "/" + m + "/" + d;
+
 </script>
 
 <body>
+<<<<<<< HEAD
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container">
         <a class="navbar-brand" href="#">Today's Top Article:<br><b>{{ article.0 }}</b></a>
@@ -39,6 +41,39 @@
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
+=======
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <div class="container">
+      <a class="navbar-brand" href="#">Welcome!</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="mainPage.html">Home <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">About</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Contact</a>
+          </li>
+        </ul>
+          <form class="form-inline my-2 my-lg-0" action="" method="POST">
+              <div>
+                <label for="party">For the last 30 days:</label>
+                <input type="date" id="dateSearch" name="search" class="form-control mr-sm-2"
+                       value = "{{ date.year }}-{{ date.month }}-{{date.day }}"
+                       min="{{ date.year }}-{{ date.month - 1 }}-{{ date.day + 1 }}"
+                       max="{{ date.year }}-{{ date.month }}-{{date.day }}"
+                       required>
+                <span class="validity"></span>
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+              </div>
+          </form>
+      </div>
+>>>>>>> ad7e1b59a3f86c07107d5efa1792a55443bd5678
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <form class="form-inline my-2 my-lg-0" action="" method="POST">
@@ -59,7 +94,12 @@
 <div class="container maincontainer">
     <div class="row">
 
+<<<<<<< HEAD
         <div class="Twit col-12 col-sm-6">
+=======
+        <div class="Twit col-sm-6">
+
+>>>>>>> ad7e1b59a3f86c07107d5efa1792a55443bd5678
             <h3>Top Twitter Posts</h3>
             <br>
             <div class = "Tweets">
@@ -77,10 +117,15 @@
             </div>
         </div>
 
+<<<<<<< HEAD
         <div class="News col-12 col-sm-6">
+=======
+        <div class="News col-12 col-sm-6" id="NYTNews">
+
+>>>>>>> ad7e1b59a3f86c07107d5efa1792a55443bd5678
             <h3>Top New York Times News</h3>
-            <a href="{{ article.1 }}" font=sm>Read More</a>
-            <iframe src="{{ article.1 }}" frameborder="5" width="100%" height=500=% sandbox=""></iframe>
+            <iframe  src="{{ article.1 }}" frameborder="5" width="100%" height=500px sandbox="" ></iframe>
+             <a href="{{ article.1 }}" font=sm target="_blank">Read More</a>
             <br>
 
         </div>
@@ -89,9 +134,9 @@
     <br>
     <br>
     <div class="row">
-        <div class="Youtube col-sm-6">
+        <div class="Youtube col-sm-12">
             <h3>Top Youtube Videos</h3>
-            <iframe width="828" height="466" src={{ videos }} frameborder="0"
+            <iframe width=100% height=300% src={{ videos }} frameborder="0"
                     allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
                     allowfullscreen>
             </iframe>
@@ -111,5 +156,6 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
         integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
         crossorigin="anonymous"></script>
+
 
 </html>
