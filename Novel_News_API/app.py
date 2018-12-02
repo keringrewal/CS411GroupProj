@@ -1,4 +1,6 @@
 import flask
+import os
+import sqlite3
 
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
@@ -11,10 +13,12 @@ from search_youtube import youtube_search
 import search_NYT
 import search_twitter
 import search_youtube
+from private import key_store
 
 import string
 from nltk.corpus import stopwords
 from datetime import *
+from flaskext.mysql import MySQL
 
 # The CLIENT_SECRETS_FILE variable specifies the name of a file that contains
 # the OAuth 2.0 information for this application, including its client_id and
@@ -28,11 +32,17 @@ API_SERVICE_NAME = 'youtube'
 API_VERSION = 'v3'
 
 app = flask.Flask(__name__, template_folder='templates')
-# Note: A secret key is included in the sample so that it works, but if you
-# use this code in your application please replace this with a truly secret
-# key. See http://flask.pocoo.org/docs/0.12/quickstart/#sessions.
-app.secret_key = 'INSERT CLIENT ID HERE'
-
+app.secret_key = 'appsecretkey'
+# mysql set up
+mysql = MySQL()
+app.config['MYSQL_DATABASE_USER'] = 'root'
+# NOTE MUST INSERT YOUR OWN PASSWORD
+app.config['MYSQL_DATABASE_PASSWORD'] = key_store.get_mysql_pass()
+app.config['MYSQL_DATABASE_DB'] = 'NovelNews'
+app.config['MYSQL_DATABASE_HOST'] = 'localhost'
+mysql.init_app(app)
+conn = mysql.connect()
+cursor = conn.cursor()
 
 @app.route('/')
 def index():
@@ -159,48 +169,78 @@ def channels_list_by_username(client, **kwargs):
 
 def get_today_info():
 
-    top_stories = search_NYT.search_NYT()
-    # top_5 = []
+    today = date.today()
+    query = "SELECT 1 FROM Dates WHERE Date = ('{0}')".format(today)
+    cursor.execute(query)
+    in_db = cursor.fetchall()
+    print(in_db)
+    print(type(in_db))
 
-    # for i in range(5):
-    top_story = top_stories['results'][0]
+    if not in_db:
+        top_stories = search_NYT.search_NYT()
 
-    stops = set(stopwords.words('english'))
+        top_story = top_stories['results'][0]
 
-    search_term = str(top_story['adx_keywords'])
-    search_term = search_term.replace(';', ' ')
-    search_terms = search_term.split(' ')
-    search_terms = [w.replace(',', '') for w in search_terms]
+        stops = set(stopwords.words('english'))
 
-    search_terms = [w for w in search_terms if not w in stops]
+        search_term = str(top_story['adx_keywords'])
+        search_term = search_term.replace(';', ' ')
+        search_terms = search_term.split(' ')
+        search_terms = [w.replace(',', '') for w in search_terms]
 
-    yt_search = "|".join(search_terms)
+        search_terms = [w for w in search_terms if not w in stops]
 
-    search_string = ("--q={0} --max-results=5").format(yt_search)
+        yt_search = "|".join(search_terms)
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--q', help='Search term', default='Google')
-    parser.add_argument('--max-results', help='Max results', default=25)
+        search_string = ("--q={0} --max-results=5").format(yt_search)
 
-    args = parser.parse_args(shlex.split(search_string))
+        parser = argparse.ArgumentParser()
+        parser.add_argument('--q', help='Search term', default='Google')
+        parser.add_argument('--max-results', help='Max results', default=25)
 
-    keywords = top_story['title']
-    exclude = set(string.punctuation)
-    keywords = ''.join(ch for ch in keywords if ch not in exclude)
-    keywords = keywords.split(' ')
-    keywords = [w for w in keywords if not w in stops]
+        args = parser.parse_args(shlex.split(search_string))
 
-    top_tweets = search_twitter.search_twitter(keywords)
-    top_videos = search_youtube.youtube_search(args)
+        keywords = top_story['title']
+        exclude = set(string.punctuation)
+        keywords = ''.join(ch for ch in keywords if ch not in exclude)
+        keywords = keywords.split(' ')
+        keywords = [w for w in keywords if not w in stops]
 
-    article = [top_story['title'], top_story['url']]
+        top_tweets = search_twitter.search_twitter(keywords)
+        top_videos = search_youtube.youtube_search(args)
 
-    return {'article': article, 'tweets' : top_tweets, 'youtube' : top_videos}
+        article = [top_story['title'], top_story['url']]
 
-    #     top_5[i] = {'article': article, 'tweets' : top_tweets, 'youtube' : top_videos}
-    #
-    # return top_5
+        print(article)
+        print(top_tweets)
+        print(top_videos)
+        print(date.today())
 
+        db_art = json.dumps(article)
+        db_twit = json.dumps(top_tweets)
+        db_yt = json.dumps(top_videos)
+
+        query = "INSERT INTO DATES (Date) VALUES ('{0}')".format(today)
+        cursor.execute(query)
+        conn.commit()
+        query = "INSERT INTO Articles (date, info) VALUES ('{0}', '{1}')".format(today, db_art)
+        cursor.execute(query)
+        conn.commit()
+        query = "INSERT INTO Tweets (date, info) VALUES ('{0}', '{1}')".format(today, db_twit)
+        cursor.execute(query)
+        conn.commit()
+        query = "INSERT INTO Videos (date, info) VALUES ('{0}', '{1}')".format(today, db_yt)
+        cursor.execute(query)
+        conn.commit()
+
+        return {'article': article, 'tweets' : top_tweets, 'youtube' : top_videos}
+
+    elif in_db:
+        query = "SELECT a.info, t.info, v.info FROM Articles a, Tweets t, Videos v " \
+                "WHERE a.date = '{0}' AND t.date = '{0}' AND v.date = '{0}'".format(today)
+        cursor.execute(query)
+        results = cursor.fetchall()
+        print(results)
 
 if __name__ == '__main__':
     # When running locally, disable OAuthlib's HTTPs verification. When
