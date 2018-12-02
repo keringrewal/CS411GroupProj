@@ -19,6 +19,7 @@ import string
 from nltk.corpus import stopwords
 from datetime import *
 from flaskext.mysql import MySQL
+import ast
 
 # The CLIENT_SECRETS_FILE variable specifies the name of a file that contains
 # the OAuth 2.0 information for this application, including its client_id and
@@ -173,8 +174,6 @@ def get_today_info():
     query = "SELECT 1 FROM Dates WHERE Date = ('{0}')".format(today)
     cursor.execute(query)
     in_db = cursor.fetchall()
-    print(in_db)
-    print(type(in_db))
 
     if not in_db:
         top_stories = search_NYT.search_NYT()
@@ -211,11 +210,6 @@ def get_today_info():
 
         article = [top_story['title'], top_story['url']]
 
-        print(article)
-        print(top_tweets)
-        print(top_videos)
-        print(date.today())
-
         db_art = json.dumps(article)
         db_twit = json.dumps(top_tweets)
         db_yt = json.dumps(top_videos)
@@ -223,24 +217,39 @@ def get_today_info():
         query = "INSERT INTO DATES (Date) VALUES ('{0}')".format(today)
         cursor.execute(query)
         conn.commit()
-        query = "INSERT INTO Articles (date, info) VALUES ('{0}', '{1}')".format(today, db_art)
-        cursor.execute(query)
-        conn.commit()
-        query = "INSERT INTO Tweets (date, info) VALUES ('{0}', '{1}')".format(today, db_twit)
-        cursor.execute(query)
-        conn.commit()
-        query = "INSERT INTO Videos (date, info) VALUES ('{0}', '{1}')".format(today, db_yt)
-        cursor.execute(query)
-        conn.commit()
 
-        return {'article': article, 'tweets' : top_tweets, 'youtube' : top_videos}
+        print(db_twit)
 
-    elif in_db:
-        query = "SELECT a.info, t.info, v.info FROM Articles a, Tweets t, Videos v " \
+        for tweet in db_twit:
+            print(tweet[0])
+            print(tweet[1])
+            print(tweet[2])
+            query = "INSERT INTO Tweets (date, tweet, tweet_url, twit_user) VALUES ('{0}', '{1}', '{2}', '{3}')"
+            vals = (today, tweet[1], tweet[0], tweet[2])
+            cursor.execute(query, vals)
+            conn.commit()
+
+        #
+        # query = "INSERT INTO Articles (date, info) VALUES ('{0}', '{1}')".format(today, db_art)
+        # cursor.execute(query)
+        # conn.commit()
+        #
+        # query = "INSERT INTO Videos (date, video) VALUES ('{0}', '{1}')".format(today, db_yt)
+        # cursor.execute(query)
+        # conn.commit()
+
+
+    else:
+        query = "SELECT a.info, t.tweet, v.video FROM Articles a, Tweets t, Videos v " \
                 "WHERE a.date = '{0}' AND t.date = '{0}' AND v.date = '{0}'".format(today)
         cursor.execute(query)
         results = cursor.fetchall()
         print(results)
+        article = json.loads(results[0])
+        top_tweets = json.loads(results[1])
+        top_videos = json.loads(results[2])
+
+    return {'article': article, 'tweets': top_tweets, 'youtube': top_videos}
 
 if __name__ == '__main__':
     # When running locally, disable OAuthlib's HTTPs verification. When
