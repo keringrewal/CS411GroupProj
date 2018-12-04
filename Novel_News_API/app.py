@@ -210,44 +210,46 @@ def get_today_info():
 
         article = [top_story['title'], top_story['url']]
 
-        db_art = json.dumps(article)
-        db_twit = json.dumps(top_tweets)
-        db_yt = json.dumps(top_videos)
+        # db_art = json.dumps(article)
+        # db_yt = json.dumps(top_videos)
 
         query = "INSERT INTO DATES (Date) VALUES ('{0}')".format(today)
         cursor.execute(query)
         conn.commit()
 
-        print(db_twit)
-
-        for tweet in db_twit:
-            print(tweet[0])
-            print(tweet[1])
-            print(tweet[2])
-            query = "INSERT INTO Tweets (date, tweet, tweet_url, twit_user) VALUES ('{0}', '{1}', '{2}', '{3}')"
-            vals = (today, tweet[1], tweet[0], tweet[2])
-            cursor.execute(query, vals)
+        for tweet in top_tweets:
+            query = "INSERT INTO Tweets (date, tweet, tweet_url, twit_user) VALUES (%s, %s, %s, %s)"
+            cursor.execute(query, (today, tweet[1], tweet[0], tweet[2]))
             conn.commit()
 
-        #
-        # query = "INSERT INTO Articles (date, info) VALUES ('{0}', '{1}')".format(today, db_art)
-        # cursor.execute(query)
-        # conn.commit()
-        #
-        # query = "INSERT INTO Videos (date, video) VALUES ('{0}', '{1}')".format(today, db_yt)
-        # cursor.execute(query)
-        # conn.commit()
+
+        query = "INSERT INTO Articles (date, title, url) VALUES (%s, %s, %s)"
+        cursor.execute(query, (today, article[0], article[1]))
+        conn.commit()
+
+        for video in top_videos:
+            query = "INSERT INTO Videos (date, title, id) VALUES (%s, %s, %s)"
+            cursor.execute(query, (today, video[0], video[1]))
+            conn.commit()
 
 
     else:
-        query = "SELECT a.info, t.tweet, v.video FROM Articles a, Tweets t, Videos v " \
-                "WHERE a.date = '{0}' AND t.date = '{0}' AND v.date = '{0}'".format(today)
+        query = "SELECT a.title, a.url FROM Articles a WHERE a.date = '{0}'".format(today)
         cursor.execute(query)
-        results = cursor.fetchall()
-        print(results)
-        article = json.loads(results[0])
-        top_tweets = json.loads(results[1])
-        top_videos = json.loads(results[2])
+        article = cursor.fetchall()
+
+        query = "SELECT v.title, v.id FROM Videos v WHERE v.date = '{0}'".format(today)
+        cursor.execute(query)
+        videos = cursor.fetchall()
+
+        query2 = "SELECT t.tweet_url, t.tweet, t.twit_user FROM Tweets t WHERE t.date = '{0}'".format(today)
+        cursor.execute(query2)
+        tweets = cursor.fetchall()
+
+        article = list(article[0])
+        top_videos = list(videos)
+        top_tweets = list(tweets)
+
 
     return {'article': article, 'tweets': top_tweets, 'youtube': top_videos}
 
