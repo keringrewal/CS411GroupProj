@@ -1,6 +1,4 @@
 import flask
-import os
-import sqlite3
 
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
@@ -8,7 +6,6 @@ import googleapiclient.discovery
 from eventregistry import *
 import argparse
 import shlex
-from search_youtube import youtube_search
 
 import search_NYT
 import search_twitter
@@ -17,9 +14,8 @@ from private import key_store
 
 import string
 from nltk.corpus import stopwords
-from datetime import *
+import datetime as dt
 from flaskext.mysql import MySQL
-import ast
 
 # The CLIENT_SECRETS_FILE variable specifies the name of a file that contains
 # the OAuth 2.0 information for this application, including its client_id and
@@ -40,12 +36,13 @@ app.config['MYSQL_DATABASE_USER'] = 'root'
 # NOTE MUST INSERT YOUR OWN PASSWORD
 app.config['MYSQL_DATABASE_PASSWORD'] = key_store.get_mysql_pass()
 app.config['MYSQL_DATABASE_DB'] = 'NovelNews'
-app.config['MYSQL_DATABASE_HOST'] = 'localhost'
+app.config['MYSQL_DATABASE_HOST'] = '127.0.0.1'
+
 mysql.init_app(app)
 conn = mysql.connect()
 cursor = conn.cursor()
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def index():
     if 'credentials' not in flask.session:
         return flask.redirect('authorize')
@@ -57,18 +54,22 @@ def index():
     client = googleapiclient.discovery.build(
         API_SERVICE_NAME, API_VERSION, credentials=credentials)
 
-    date = datetime.today()
+    if flask.request.method == 'POST':
+        return flask.redirect(flask.url_for('search'))
 
-    info = get_today_info()
-    article = info['article']
-    tweets = info['tweets']
-    yt = info['youtube']
+    else:
+        info = get_today_info()
 
-    videos = "https://www.youtube.com/embed/VIDEO_ID?playlist="
-    for title, id in yt:
-        videos = videos + ',' + id
+        article = info['article']
+        tweets = info['tweets']
+        yt = info['youtube']
+        disp_date = info['date']
 
-    return flask.render_template('mainPage.html', article = article, tweets = tweets, videos = videos, date = date)
+        videos = "https://www.youtube.com/embed/VIDEO_ID?playlist="
+        for title, id in yt:
+            videos = videos + ',' + id
+
+        return flask.render_template('mainPage.html', article = article, tweets = tweets, videos = videos, date = disp_date)
 
 
 @app.route('/authorize')
@@ -119,13 +120,25 @@ def oauth2callback():
         'scopes': credentials.scopes
     }
 
-    date = datetime.today()
-    # minDate = datetime.today().timedelta(days = -30).strftime('%Y-%m-%d')
+    return flask.redirect(flask.url_for('index'), code = 302)
 
-    info = get_today_info()
+
+@app.route('/search', methods=['GET', 'POST'])
+def search():
+
+    search_date = flask.request.form.get('search')
+    today = dt.date.today()
+    today = str(today)
+    if search_date == today:
+        info = get_today_info()
+    else:
+        print(search_date)
+        info = search_results(search_date)
+
     article = info['article']
     tweets = info['tweets']
     yt = info['youtube']
+    date = info['date']
 
     print(article)
 
@@ -135,42 +148,58 @@ def oauth2callback():
 
     return flask.render_template('mainPage.html', article = article, tweets = tweets, videos = videos, date = date)
 
+#
+# @app.errorhandler(405)
+# def not_found(error):
+#     info = get_today_info()
+#
+#     article = info['article']
+#     tweets = info['tweets']
+#     yt = info['youtube']
+#     disp_date = info['date']
+#
+#     videos = "https://www.youtube.com/embed/VIDEO_ID?playlist="
+#     for title, id in yt:
+#         videos = videos + ',' + id
+#
+#     return flask.render_template('mainPage.html', article = article, tweets = tweets,
+#                                  videos = videos, date = disp_date), 405
+#
 
 
-@app.route("/search/", methods=["POST"])
-def search():
-    if flask.request.method == 'POST':
+def search_results(date):
+    query = "SELECT 1 FROM Dates WHERE Date = ('{0}')".format(date)
+    cursor.execute(query)
+    in_db = cursor.fetchall()
+    print(in_db)
 
-        # search by title
-        search_term = flask.request.form.get('search')
-        search_string = ("--q={0} --max-results=5").format(search_term)
+    if in_db:
+        query = "SELECT a.title, a.url FROM Articles a WHERE a.date = '{0}'".format(date)
+        cursor.execute(query)
+        article = cursor.fetchall()
+        print(article)
 
-        parser = argparse.ArgumentParser()
-        parser.add_argument('--q', help='Search term', default='Google')
-        parser.add_argument('--max-results', help='Max results', default=25)
+        query = "SELECT v.title, v.id FROM Videos v WHERE v.date = '{0}'".format(date)
+        cursor.execute(query)
+        videos = cursor.fetchall()
 
-        args = parser.parse_args(shlex.split(search_string))
+        query2 = "SELECT t.tweet_url, t.tweet, t.twit_user FROM Tweets t WHERE t.date = '{0}'".format(date)
+        cursor.execute(query2)
+        tweets = cursor.fetchall()
 
-        results = youtube_search(args)
+        article = list(article[0])
+        top_videos = list(videos)
+        top_tweets = list(tweets)
 
-        results = [result.split('\t') for result in results]
+        return {'article': article, 'tweets': top_tweets, 'youtube': top_videos, 'date': date}
 
-        video = "https://www.youtube.com/embed/" + results[0][1].strip()
+    else:
+        return get_today_info()
 
-        return flask.render_template('mainResults.html', videos=results, video = video)
-
-
-
-def channels_list_by_username(client, **kwargs):
-    response = client.channels().list(
-        **kwargs
-    ).execute()
-
-    return flask.jsonify(**response)
 
 def get_today_info():
 
-    today = date.today()
+    today = dt.date.today()
     query = "SELECT 1 FROM Dates WHERE Date = ('{0}')".format(today)
     cursor.execute(query)
     in_db = cursor.fetchall()
@@ -180,18 +209,7 @@ def get_today_info():
 
         top_story = top_stories['results'][0]
 
-        stops = set(stopwords.words('english'))
-
-        search_term = str(top_story['adx_keywords'])
-        search_term = search_term.replace(';', ' ')
-        search_terms = search_term.split(' ')
-        search_terms = [w.replace(',', '') for w in search_terms]
-
-        search_terms = [w for w in search_terms if not w in stops]
-
-        yt_search = "|".join(search_terms)
-
-        search_string = ("--q={0} --max-results=5").format(yt_search)
+        search_string = ("--q='{0}' --max-results=5").format(top_story['title'])
 
         parser = argparse.ArgumentParser()
         parser.add_argument('--q', help='Search term', default='Google')
@@ -199,6 +217,7 @@ def get_today_info():
 
         args = parser.parse_args(shlex.split(search_string))
 
+        stops = set(stopwords.words('english'))
         keywords = top_story['title']
         exclude = set(string.punctuation)
         keywords = ''.join(ch for ch in keywords if ch not in exclude)
@@ -209,9 +228,6 @@ def get_today_info():
         top_videos = search_youtube.youtube_search(args)
 
         article = [top_story['title'], top_story['url']]
-
-        # db_art = json.dumps(article)
-        # db_yt = json.dumps(top_videos)
 
         query = "INSERT INTO DATES (Date) VALUES ('{0}')".format(today)
         cursor.execute(query)
@@ -251,7 +267,7 @@ def get_today_info():
         top_tweets = list(tweets)
 
 
-    return {'article': article, 'tweets': top_tweets, 'youtube': top_videos}
+    return {'article': article, 'tweets': top_tweets, 'youtube': top_videos, 'date': today}
 
 if __name__ == '__main__':
     # When running locally, disable OAuthlib's HTTPs verification. When
