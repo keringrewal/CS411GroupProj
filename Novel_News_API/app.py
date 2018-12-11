@@ -132,7 +132,6 @@ def search():
     if search_date == today:
         info = get_today_info()
     else:
-        print(search_date)
         info = search_results(search_date)
 
     article = info['article']
@@ -140,7 +139,6 @@ def search():
     yt = info['youtube']
     date = info['date']
 
-    print(article)
 
     videos = "https://www.youtube.com/embed/VIDEO_ID?playlist="
     for title, id in yt:
@@ -148,36 +146,16 @@ def search():
 
     return flask.render_template('mainPage.html', article = article, tweets = tweets, videos = videos, date = date)
 
-#
-# @app.errorhandler(405)
-# def not_found(error):
-#     info = get_today_info()
-#
-#     article = info['article']
-#     tweets = info['tweets']
-#     yt = info['youtube']
-#     disp_date = info['date']
-#
-#     videos = "https://www.youtube.com/embed/VIDEO_ID?playlist="
-#     for title, id in yt:
-#         videos = videos + ',' + id
-#
-#     return flask.render_template('mainPage.html', article = article, tweets = tweets,
-#                                  videos = videos, date = disp_date), 405
-#
-
 
 def search_results(date):
     query = "SELECT 1 FROM Dates WHERE Date = ('{0}')".format(date)
     cursor.execute(query)
     in_db = cursor.fetchall()
-    print(in_db)
 
     if in_db:
         query = "SELECT a.title, a.url FROM Articles a WHERE a.date = '{0}'".format(date)
         cursor.execute(query)
         article = cursor.fetchall()
-        print(article)
 
         query = "SELECT v.title, v.id FROM Videos v WHERE v.date = '{0}'".format(date)
         cursor.execute(query)
@@ -234,9 +212,13 @@ def get_today_info():
         conn.commit()
 
         for tweet in top_tweets:
-            query = "INSERT INTO Tweets (date, tweet, tweet_url, twit_user) VALUES (%s, %s, %s, %s)"
-            cursor.execute(query, (today, tweet[1], tweet[0], tweet[2]))
-            conn.commit()
+            try:
+                query = "INSERT INTO Tweets (date, tweet, tweet_url, twit_user) VALUES (%s, %s, %s, %s)"
+                cursor.execute(query, (today, tweet[1], tweet[0], tweet[2]))
+                conn.commit()
+            except Exception as e:
+                print(e)
+                continue
 
 
         query = "INSERT INTO Articles (date, title, url) VALUES (%s, %s, %s)"
