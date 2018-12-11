@@ -71,6 +71,9 @@ def index():
 
         return flask.render_template('mainPage.html', article = article, tweets = tweets, videos = videos, date = disp_date)
 
+@app.route('/about')
+def about():
+    return flask.render_template('about.html', date = dt.date.today())
 
 @app.route('/authorize')
 def authorize():
